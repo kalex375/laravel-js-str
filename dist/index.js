@@ -1,6 +1,24 @@
 'use strict';
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Stringable = Stringable;
+exports.Str = exports["default"] = void 0;
+
+var _pluralize = _interopRequireDefault(require("pluralize"));
+
+var _collect = _interopRequireDefault(require("collect.js"));
+
+var _preg_match = _interopRequireDefault(require("locutus/php/pcre/preg_match.js"));
+
+var _ctype_lower = _interopRequireDefault(require("locutus/php/ctype/ctype_lower.js"));
+
+var _substr_count = _interopRequireDefault(require("locutus/php/strings/substr_count.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
@@ -10,7 +28,7 @@ function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableTo
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
@@ -22,7 +40,7 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
@@ -36,17 +54,6 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 var _uuid = 'uuid',
     uuidv4 = _uuid.v4;
-
-var pluralize = require('pluralize');
-
-var _require = require('collect.js'),
-    collect = _require.collect;
-
-var preg_match = require('locutus/php/pcre/preg_match.js');
-
-var ctype_lower = require('locutus/php/ctype/ctype_lower.js');
-
-var substr_count = require('locutus/php/strings/substr_count.js');
 
 function str_replace(search, replace, subject, countObj) {
   var i = 0;
@@ -199,14 +206,21 @@ function rtrim(str, charlist) {
   var re = new RegExp('[' + charlist + ']+$', 'g');
   return (str + '').replace(re, '');
 }
+
+function forceString(any) {
+  if (typeof any === 'string') return any;
+  if (any === null) return '';
+  if (any === undefined) return '';
+  return String(any);
+}
 /**
  * @return {string}
  */
 
 
 function Stringable(value) {
-  this.value = value;
-  return "".concat(this.value);
+  this.value = forceString(value);
+  return this.value;
 }
 /**
  * Return the remainder of a string after the first occurrence of a given value
@@ -390,7 +404,7 @@ Stringable.prototype.exactly = function (value) {
 
 Stringable.prototype.explode = function (delimiter) {
   var limit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Number.MAX_SAFE_INTEGER;
-  return collect(explode(delimiter, this.value, limit));
+  return (0, _collect["default"])(explode(delimiter, this.value, limit));
 };
 /**
  * Split a string using a regular expression.
@@ -407,7 +421,7 @@ Stringable.prototype.split = function (pattern) {
   var limit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
   var flags = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
   var segments = this.value.split(new RegExp(pattern));
-  return !(typeof segments === 'undefined' || segments.length < 1) ? collect(segments) : collect();
+  return !(typeof segments === 'undefined' || segments.length < 1) ? (0, _collect["default"])(segments) : (0, _collect["default"])();
 };
 /**
  * Cap a string with a single instance of a given value
@@ -521,7 +535,7 @@ Stringable.prototype.lower = function () {
 
 
 Stringable.prototype.match = function (pattern) {
-  var matches = preg_match(pattern, this.value);
+  var matches = (0, _preg_match["default"])(pattern, this.value);
 
   if (!matches) {
     return new Stringable('');
@@ -922,7 +936,7 @@ var Pluralizer = /*#__PURE__*/function () {
 
   _createClass(Pluralizer, null, [{
     key: "plural",
-
+    value:
     /**
      * Get the plural form of an English word.
      *
@@ -931,7 +945,7 @@ var Pluralizer = /*#__PURE__*/function () {
      *
      * @return string
      */
-    value: function plural(value) {
+    function plural(value) {
       var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 
       if (Math.abs(count) === 1 || Pluralizer.uncountable(value)) {
@@ -1032,7 +1046,7 @@ var Pluralizer = /*#__PURE__*/function () {
     key: "inflector",
     value: function inflector() {
       if (typeof Pluralizer.inflection === 'undefined') {
-        Pluralizer.inflection = pluralize;
+        Pluralizer.inflection = _pluralize["default"];
         Pluralizer.rules.uncountable.forEach(function (uncountable) {
           return Pluralizer.inflection.addUncountableRule(uncountable);
         });
@@ -1080,7 +1094,7 @@ var Str = /*#__PURE__*/function () {
 
   _createClass(Str, null, [{
     key: "of",
-
+    value:
     /**
      * The cache of snake-cased words
      *
@@ -1111,7 +1125,7 @@ var Str = /*#__PURE__*/function () {
      * @param string string
      * @return Stringable
      */
-    value: function of(string) {
+    function of(string) {
       return new Stringable(string);
     }
     /**
@@ -1127,6 +1141,7 @@ var Str = /*#__PURE__*/function () {
     key: "after",
     value: function after(subject) {
       var search = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+      subject = forceString(subject);
       return search === '' || subject.indexOf(search) === -1 ? subject : subject.substr(subject.indexOf(search) + search.length);
     }
     /**
@@ -1142,6 +1157,7 @@ var Str = /*#__PURE__*/function () {
     key: "afterLast",
     value: function afterLast(subject) {
       var search = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+      subject = forceString(subject);
       return search === '' || subject.indexOf(search) === -1 ? subject : subject.substr(subject.lastIndexOf(search) + search.length);
     }
     /**
@@ -1158,6 +1174,7 @@ var Str = /*#__PURE__*/function () {
     value: function ascii() {
       var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
       var language = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'en';
+      value = forceString(value);
       return String.fromCharCode.apply(String, _toConsumableArray(value.split('').map(function (character) {
         return character.charCodeAt(0);
       })));
@@ -1175,6 +1192,7 @@ var Str = /*#__PURE__*/function () {
     key: "before",
     value: function before(subject) {
       var search = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+      subject = forceString(subject);
       return search === '' || subject.indexOf(search) === -1 ? subject : subject.substr(0, subject.indexOf(search));
     }
     /**
@@ -1190,6 +1208,7 @@ var Str = /*#__PURE__*/function () {
     key: "beforeLast",
     value: function beforeLast(subject) {
       var search = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+      subject = forceString(subject);
       return search === '' || subject.indexOf(search) === -1 ? subject : subject.substr(0, subject.lastIndexOf(search));
     }
     /**
@@ -1207,6 +1226,7 @@ var Str = /*#__PURE__*/function () {
     value: function between(subject) {
       var at = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
       var to = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+      subject = forceString(subject);
       return subject.indexOf(at) === -1 || subject.indexOf(to) === -1 ? subject : Str.beforeLast(Str.after(subject, at), to);
     }
     /**
@@ -1221,6 +1241,7 @@ var Str = /*#__PURE__*/function () {
     key: "camel",
     value: function camel() {
       var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+      value = forceString(value);
 
       if (typeof Str.camelCache[value] !== 'undefined') {
         return Str.camelCache[value];
@@ -1242,6 +1263,7 @@ var Str = /*#__PURE__*/function () {
     key: "contains",
     value: function contains(haystack) {
       var needles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      haystack = forceString(haystack);
       return Array.isArray(needles) ? needles.some(function (needle) {
         return haystack.includes(needle);
       }) : haystack.includes(needles);
@@ -1259,6 +1281,7 @@ var Str = /*#__PURE__*/function () {
     key: "containsAll",
     value: function containsAll(haystack) {
       var needles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      haystack = forceString(haystack);
       return needles.every(function (needle) {
         return haystack.includes(needle);
       });
@@ -1276,6 +1299,7 @@ var Str = /*#__PURE__*/function () {
     key: "endsWith",
     value: function endsWith(haystack) {
       var needles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      haystack = forceString(haystack);
       return Array.isArray(needles) ? needles.some(function (needle) {
         return haystack.substr(-needle.length) === needle;
       }) : haystack.substr(-needles.length) === needles;
@@ -1292,6 +1316,7 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "finish",
     value: function finish(value, cap) {
+      value = forceString(value);
       return Str.endsWith(value, cap) ? value : "".concat(value).concat(cap);
     }
     /**
@@ -1306,6 +1331,7 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "is",
     value: function is(pattern, value) {
+      value = forceString(value);
       var patterns = Array.isArray(pattern) ? pattern : [pattern];
       return patterns.some(function (pattern) {
         if (value === pattern) return true;else if (pattern.includes('*') === false) return new RegExp(pattern).test(value);else if (pattern.includes('*')) return new RegExp(pattern.replace(/\*/g, '.*')).test(value);
@@ -1340,7 +1366,7 @@ var Str = /*#__PURE__*/function () {
         return false;
       }
 
-      return preg_match('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', value) > 0;
+      return (0, _preg_match["default"])('/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iD', value) > 0;
     }
     /**
      * Convert a string to kebab case.
@@ -1353,6 +1379,7 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "kebab",
     value: function kebab(value) {
+      value = forceString(value);
       return Str.snake(value, '-');
     }
     /**
@@ -1368,6 +1395,7 @@ var Str = /*#__PURE__*/function () {
     key: "snake",
     value: function snake(value) {
       var delimiter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '_';
+      value = forceString(value);
       var key = value;
 
       if (typeof Str.snakeCache !== 'undefined') {
@@ -1376,7 +1404,7 @@ var Str = /*#__PURE__*/function () {
         }
       }
 
-      if (!ctype_lower(value)) {
+      if (!(0, _ctype_lower["default"])(value)) {
         Str.snakeCache[key] = _objectSpread(_objectSpread({}, Str.snakeCache[key] || {}), {}, _defineProperty({}, delimiter, value.match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g).map(function (x) {
           return x.toLowerCase();
         }).join(delimiter)));
@@ -1402,6 +1430,7 @@ var Str = /*#__PURE__*/function () {
     value: function length() {
       var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
       var encoding = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      value = forceString(value);
       return value.length;
     }
     /**
@@ -1422,6 +1451,7 @@ var Str = /*#__PURE__*/function () {
       var _limit = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
 
       var end = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '...';
+      value = forceString(value);
       return value.length < _limit ? value : value.slice(0, _limit) + end;
     }
     /**
@@ -1436,6 +1466,7 @@ var Str = /*#__PURE__*/function () {
     key: "lower",
     value: function lower() {
       var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+      value = forceString(value);
       return value.toLocaleLowerCase();
     }
     /**
@@ -1456,6 +1487,7 @@ var Str = /*#__PURE__*/function () {
       var _words = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
 
       var end = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '...';
+      value = forceString(value);
       var word = value.split(' ');
       return word.length <= _words ? value : word.slice(0, _words).join(" ") + end;
     }
@@ -1487,6 +1519,7 @@ var Str = /*#__PURE__*/function () {
     key: "plural",
     value: function plural(value) {
       var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+      value = forceString(value);
       return Pluralizer.plural(value, count);
     }
     /**
@@ -1502,6 +1535,7 @@ var Str = /*#__PURE__*/function () {
     key: "pluralStudly",
     value: function pluralStudly(value) {
       var count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+      value = forceString(value);
 
       var _value$split = value.split(/(?=[A-Z][^A-Z]+$)/),
           _value$split2 = _slicedToArray(_value$split, 2),
@@ -1569,6 +1603,8 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "replaceFirst",
     value: function replaceFirst(search, replace, subject) {
+      subject = forceString(subject);
+
       if (search === '') {
         return subject;
       }
@@ -1596,6 +1632,8 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "replaceLast",
     value: function replaceLast(search, replace, subject) {
+      subject = forceString(subject);
+
       if (search === '') {
         return subject;
       }
@@ -1622,6 +1660,7 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "start",
     value: function start(value, prefix) {
+      value = forceString(value);
       return Str.startsWith(value, prefix) ? value : "".concat(prefix).concat(value);
     }
     /**
@@ -1635,6 +1674,7 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "studly",
     value: function studly(value) {
+      value = forceString(value);
       var key = value;
 
       if (typeof Str.studlyCache[key] !== 'undefined') {
@@ -1656,6 +1696,7 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "upper",
     value: function upper(value) {
+      value = forceString(value);
       return value.toLocaleUpperCase();
     }
     /**
@@ -1669,6 +1710,7 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "title",
     value: function title(value) {
+      value = forceString(value);
       return Str.snake(value).split('_').map(function (word) {
         return Str.ucfirst(word);
       }).join(' ');
@@ -1683,6 +1725,7 @@ var Str = /*#__PURE__*/function () {
   }, {
     key: "singular",
     value: function singular(value) {
+      value = forceString(value);
       return Pluralizer.singular(value);
     }
     /**
@@ -1700,6 +1743,7 @@ var Str = /*#__PURE__*/function () {
     value: function slug(title) {
       var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '-';
       var language = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'en';
+      title = forceString(title);
       title = title.toLocaleString();
       var slug = Str.snake(title.replace(/@/g, '_at_')).replace(/_/g, separator).trim();
       return slug[0] === separator ? slug.slice(1, slug.length) : slug;
@@ -1717,6 +1761,7 @@ var Str = /*#__PURE__*/function () {
     key: "startsWith",
     value: function startsWith(haystack) {
       var needles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      haystack = forceString(haystack);
       return Array.isArray(needles) ? needles.some(function (needle) {
         return haystack.startsWith(needle);
       }) : haystack.substr(0, needles.length) === needles;
@@ -1735,6 +1780,7 @@ var Str = /*#__PURE__*/function () {
     key: "substr",
     value: function substr(string, start) {
       var length = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      string = forceString(string);
       return string.slice(start, start + length);
     }
     /**
@@ -1752,11 +1798,12 @@ var Str = /*#__PURE__*/function () {
     key: "substrCount",
     value: function substrCount(haystack, needle, offset) {
       var length = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+      haystack = forceString(haystack);
 
       if (length === null) {
-        return substr_count(haystack, needle, offset);
+        return (0, _substr_count["default"])(haystack, needle, offset);
       } else {
-        return substr_count(haystack, needle, offset, length);
+        return (0, _substr_count["default"])(haystack, needle, offset, length);
       }
     }
     /**
@@ -1771,6 +1818,7 @@ var Str = /*#__PURE__*/function () {
     key: "ucfirst",
     value: function ucfirst() {
       var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+      value = forceString(value);
       if (value.length === 0) return value;
       if (value.length === 1) return value[0].toUpperCase();
       return value[0].toUpperCase() + value.slice(1);
@@ -1838,9 +1886,9 @@ var Str = /*#__PURE__*/function () {
   return Str;
 }();
 
+exports.Str = Str;
 Str.snakeCache = {};
 Str.camelCache = {};
 Str.studlyCache = {};
-module.exports = Str;
-module.exports.Str = Str;
-module.exports["default"] = Str;
+var _default = Str;
+exports["default"] = _default;
