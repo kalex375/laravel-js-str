@@ -1,9 +1,8 @@
 import type Collection from "collect.js"
 
 declare module 'laravel-js-str' {
-    //export function collect<T>(collection?: T[] | Object): Collection<T>;
-    //export default function collect<T>(collection?: T[] | Object): Collection<T>;
-    class Stringable {
+
+    export class Stringable {
         constructor(value?: any);
 
         /**
@@ -294,11 +293,228 @@ declare module 'laravel-js-str' {
         public valueOf()
     }
 
-    export class Str {
-        //constructor(collection?: Item[] | Object);
+    export default class Str {
 
         static of(str): Stringable
 
+        /**
+         * Return the remainder of a string after the first occurrence of a given value
+         *
+         */
+        static after(subject, search?: string): string
 
+        /**
+         * Returns the remainder of a string after the last occurrence of a given value
+         *
+         */
+        static afterLast(subject, search?: string): string
+
+        /**
+         * Transliterate a UTF-8 value to ASCII.
+         *
+         */
+        static ascii(value?: string, language?: string): string
+
+        /**
+         * Get the portion of a string before the first occurrence of a given value
+         *
+         */
+        static before(subject, search?: string): string
+
+        /**
+         * Get the portion of a string before the last occurrence of a given value
+         *
+         */
+        static beforeLast(subject, search?: string): string
+
+        /**
+         * Get the portion of a string between two given values
+         *
+         */
+        static between(subject, at?: string, to?: string): string
+
+        /**
+         * Convert a value to camel case.
+         *
+         */
+        static camel(value?: string): string
+
+        /**
+         * Determine if a given string contains a given substring.
+         *
+         */
+        static contains(haystack, needles: string | Array<string>): boolean
+
+        /**
+         * Determine if a given string contains all array values
+         *
+         */
+        static containsAll(haystack, needles?: Array<string>): boolean
+
+        /**
+         * Determine if a given string ends with a given substring
+         *
+         */
+        static endsWith(haystack, needles: string | Array<string>): boolean
+
+        /**
+         * Cap a string with a single instance of a given value if it doesnt already end with it
+         *
+         */
+        static finish(value, cap): string
+
+        /**
+         * Determine if a given string matches a given pattern
+         *
+         */
+        static is(pattern, value): boolean
+
+        /**
+         * Determine if a given string is 7 bit ASCII
+         *
+         */
+        static isAscii(value): boolean
+
+        /**
+         * Determine if a given string is valid UUID.
+         *
+         */
+        static isUuid(value): boolean
+
+        /**
+         * Convert a string to kebab case.
+         *
+         */
+        static kebab(value): string
+
+        /**
+         * Convert a string to snake case.
+         *
+         */
+        static snake(value, delimiter?: string): string
+
+        /**
+         * Return the length of the given string
+         *
+         */
+        static length(value?: string, encoding?: string): number
+
+
+        /**
+         * Limit the number of characters in a string
+         *
+         */
+        static limit(value?: string, limit ?: number, end?: string): string
+
+        /**
+         * Convert the given string to lower-case.
+         */
+        static lower(value?: string): string
+
+        /**
+         * Limit the number of words in a string.
+         *
+         */
+        static words(value?: string, words ?: number, end ?: string): string
+
+        /**
+         * Parse a Class[@]method style callback into class and method.
+         *
+         */
+        static parseCallback(callback, fallback): Array<string>
+
+        /**
+         * Get the plural form of an english word
+         *
+         */
+        static plural(value, count?: number): string
+
+        /**
+         * Pluralize the last word of an English, studly caps case string.
+         *
+         */
+        static pluralStudly(value, count: number): string
+
+        /**
+         * Generate a more truly "random" alpha-numeric string.
+         *
+         */
+        static random(length ?: number): string
+
+        /**
+         * Replace a given value in the string sequentially with an array.
+         *
+         */
+        static replaceArray(search, replace: Array<string>, subject): string
+
+        /**
+         * Replace the first occurrence of a given value in the string.
+         *
+         */
+        static replaceFirst(search, replace, subject): string
+
+        /**
+         * Replace the last occurrence of a given value in the string
+         */
+        static replaceLast(search, replace, subject): string
+
+        /**
+         * Begin a string with a single instance of a given value.
+         */
+        static start(value, prefix): string
+
+        /**
+         * Convert a value to studly caps case
+         */
+        static studly(value): string
+
+        /**
+         * Convert the given string to upper-case
+         *
+         */
+        static upper(value): string
+
+        /**
+         * Convert the given string to title case.
+         *
+         */
+        static title(value): string
+
+        /**
+         * Get the singular form of an English word.
+         *
+         */
+        static singular(value): string
+
+        /**
+         * Generate a URL friendly "slug" from a given string.
+         */
+        static slug(title, separator?: string, language?: string): string
+
+        /**
+         * Determine if a given string starts with a given substring
+         */
+        static startsWith(haystack, needles?: string | Array<string>): boolean
+
+        /**
+         * Returns the portion of string specified by the start and length parameters
+         */
+        static substr(string, start, length ?): string
+
+        /**
+         * Returns the number of substring occurrences
+         */
+        static substrCount(haystack, needle, offset, length?): number
+
+        /**
+         * Make a strings first character upper case.
+         */
+        static ucfirst(value?: string): string
+
+
+        /**
+         * Generate a UUID (version 4).
+         */
+        static uuid(): string
     }
 }
