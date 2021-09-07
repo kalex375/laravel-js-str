@@ -3,7 +3,7 @@
   "version": "1.0.3",
   "description": "",
   "main": "dist/index.js",
-  "typings": "index.d.ts",
+  "types": "index.d.ts",
   "scripts": {
     "all": "npm run build && npm test",
     "pretest": "npm run transpile",
